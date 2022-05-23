@@ -8,11 +8,13 @@ import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.ItemRepository;
 import jpabook.jpashop.repository.MemberRepository;
 import jpabook.jpashop.repository.OrderRepository;
+import jpabook.jpashop.repository.OrderSearch;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sound.sampled.DataLine;
+import java.util.List;
 
 
 @Service
@@ -59,14 +61,20 @@ public class OrderService {
         Order order = orderRepository.findOne(orderId);
         //주문 취소(이미 Order에 주문취소 비즈니스 로직 만들었음)
         order.cancel();
+    }
 
     /**
      * 검색
+     * [실무] 아키텍처마다 다르겠지만, (지금처럼) 단순 위임의 경우
+     * Controller에서 바로 Repository 접근해서 처리 가능
      */
-
-
-
+    public List<Order> findOrders(OrderSearch orderSearch) {
+        return orderRepository.findAllByString(orderSearch);
     }
+
+
+
+
 
 
 }
