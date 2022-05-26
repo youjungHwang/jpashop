@@ -90,5 +90,30 @@ public class OrderRepository {
                 .getResultList();
     }
 
+    /**
+     * 컬렉션인 일대다 관계(OneToMany) 조회 최적화(V3) - 페치 조인
+     *   문제)
+     *   join fetch o.orderItems 하면 order가 2개가 아닌 4개 출력(orderItem 수 만큼 나옴, 중복 출력됨)
+     *   해결) distinct를 JPQL에 추가해서 중복 제거
+     *     문제) 페이징 안 됨
+     */
+    public List<Order> findAllWithItem() {
+        return em.createQuery(
+                        "select distinct o from Order o" +
+                                " join fetch o.member m" +
+                                " join fetch o.delivery d" +
+                                " join fetch o.orderItems oi" +
+                                " join fetch oi.item i", Order.class)
+                .getResultList();
+    }
 
+    public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+        return em.createQuery(
+                        "select o from Order o" +
+                                " join fetch o.member m" +
+                                " join fetch o.delivery d", Order.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
 }
