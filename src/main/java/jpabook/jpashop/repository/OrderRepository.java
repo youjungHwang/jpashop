@@ -65,5 +65,30 @@ public class OrderRepository {
         return query.getResultList();
     }
 
+    /**
+     *  @XToOne 조회 성능 최적화(V3) - 페치 조인
+     *   지연 로딩, 프록시 무시하고 진짜 객체의 값을 채워서 가져옴
+     *   em.createQuery(JPQL, 반환타입)
+     */
+    public List<Order> findAllWithMemberDelivery() {
+        return em.createQuery(
+                        "select o from Order o" +
+                                " join fetch o.member m" +
+                                " join fetch o.delivery d", Order.class) 
+                .getResultList();
+    }
+
+    /**
+     * @XToOne 조회 성능 최적화(V4)
+     */
+    public List<OrderSimpleQueryDto> findOrderDtos() {
+        return em.createQuery(
+                        "select new jpabook.jpashop.repository.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address)" +
+                                " from Order o" +
+                                " join o.member m" +
+                                " join o.delivery d", OrderSimpleQueryDto.class)
+                .getResultList();
+    }
+
 
 }
